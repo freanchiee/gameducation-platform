@@ -1,0 +1,116 @@
+/* === Hero Section with Blobs === */
+.oblique-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  overflow: hidden;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1f3674, #274e68);
+}
+
+@media (min-width: 768px) {
+  .oblique-hero {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.blob-container {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.25;
+  mix-blend-mode: screen;
+  animation: blobPulse 20s infinite ease-in-out alternate;
+  transition: transform 0.5s ease-in-out;
+}
+
+.blob:nth-child(1) {
+  width: 400px;
+  height: 400px;
+  top: -100px;
+  left: -100px;
+  background: #00bcd4;
+  animation-delay: 0s;
+}
+
+.blob:nth-child(2) {
+  width: 300px;
+  height: 300px;
+  bottom: -100px;
+  right: -50px;
+  background: #9c27b0;
+  animation-delay: 5s;
+}
+
+.blob:nth-child(3) {
+  width: 350px;
+  height: 350px;
+  top: 50%;
+  left: 50%;
+  background: #ffc107;
+  transform: translate(-50%, -50%);
+  animation-delay: 2.5s;
+}
+
+@keyframes blobPulse {
+  0% {
+    transform: scale(1) translate(0px, 0px) rotate(0deg);
+    border-radius: 50% 50% 50% 50%;
+  }
+  50% {
+    transform: scale(1.2) translate(40px, -30px) rotate(20deg);
+    border-radius: 60% 40% 70% 30%;
+  }
+  100% {
+    transform: scale(1) translate(0px, 0px) rotate(-20deg);
+    border-radius: 50% 50% 50% 50%;
+  }
+}
+
+/* Glass morph */
+.glass-box {
+  position: relative;
+  z-index: 10;
+  backdrop-filter: blur(12px);
+  background-color: rgba(0, 0, 0, 0.35);
+  border-radius: 1rem;
+  padding: 2rem;
+  margin: 2rem;
+  color: #fefefe;
+}
+
+/* Split indicator */
+.hero-separator {
+  background: #facc15;
+  width: 4px;
+  height: 80%;
+  margin: 0 auto;
+  border-radius: 2px;
+}
+@media (max-width: 768px) {
+  .hero-separator {
+    width: 80%;
+    height: 4px;
+  }
+}
+
+/* Dark mode */
+:root {
+  --color-navy: #1f3674;
+  --color-dark-blue: #274e68;
+  --color-cream: #f5edaf;
+}
+.dark .oblique-hero {
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+}
+.dark .glass-box {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #e2e8f0;
+}
