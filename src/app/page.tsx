@@ -1,4 +1,5 @@
 import Link from "next/link"
+import HeroImage from "./_components/HeroImage"
 import {
   ArrowRight,
   Check,
@@ -10,7 +11,6 @@ import {
   Trophy,
   Star,
   Quote,
-  Menu,
   Rocket,
   Smartphone,
   Users,
@@ -115,76 +115,151 @@ function CTAButton({
   )
 }
 
-/* ── Page ──────────────────────────────────────────────────────────────────── */
-export default function LandingPage() {
+/* ── Photo hero — overlay composited onto /public/hero-desk.png ─────────────────
+   Positions are percentages over the background photo. `label*` sits ABOVE each
+   monitor (centered via -translate-x-1/2); `screen*` lays the product UI ONTO the
+   monitor (left = left edge). Tune these against the screenshot after the image
+   file is in place. Order matches PRODUCTS: Rekhachitra, GBL, Strandhoot. */
+const HERO_POS = [
+  { labelLeft: "22%", labelTop: "14%", labelW: "22%", screenLeft: "11.4%", screenTop: "33%", screenW: "22%" },
+  { labelLeft: "49%", labelTop: "18.5%", labelW: "23%", screenLeft: "37.8%", screenTop: "33%", screenW: "22%" },
+  { labelLeft: "73%", labelTop: "14%", labelW: "22%", screenLeft: "61.8%", screenTop: "33%", screenW: "22%" },
+] as const
+
+function PhotoHero() {
   return (
-    <div className="min-h-screen" style={{ background: CANVAS }}>
-      {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-black/5 bg-white/85 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-5">
+    <section className="relative w-full overflow-hidden bg-[#0c1322]">
+      {/* lg+ — overlay composited onto the lifestyle photo */}
+      <div className="relative mx-auto hidden aspect-[16/9] w-full max-w-[1700px] lg:block">
+        <HeroImage />
+
+        {/* Brand + tagline (top-center) */}
+        <div className="pointer-events-none absolute inset-x-0 top-[3%] flex flex-col items-center text-center">
+          <div className="flex items-center gap-3">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo.png"
+              alt="Gameducation"
+              className="size-12 drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]"
+            />
+            <span
+              className="font-extrabold tracking-tight text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.55)]"
+              style={{ fontFamily: "var(--font-display)", fontSize: "clamp(1.6rem,3vw,3.4rem)" }}
+            >
+              Gameducation
+            </span>
+          </div>
+          <p
+            className="mt-1 text-white/80 drop-shadow-[0_1px_8px_rgba(0,0,0,0.6)]"
+            style={{ fontSize: "clamp(.8rem,1.15vw,1.2rem)" }}
+          >
+            One platform. Three ways to make learning unforgettable.
+          </p>
+        </div>
+
+        {/* Start free (top-right) */}
+        <Link
+          href="/login"
+          className="absolute right-[3%] top-[3.5%] rounded-full bg-white/95 px-4 py-2 text-sm font-semibold shadow-lg backdrop-blur transition hover:bg-white"
+          style={{ color: GBL }}
+        >
+          Start free
+        </Link>
+
+        {/* Per-product label + CTA, above each monitor */}
+        {PRODUCTS.map((p, i) => (
+          <div
+            key={p.name}
+            className="absolute -translate-x-1/2 text-center"
+            style={{ left: HERO_POS[i].labelLeft, top: HERO_POS[i].labelTop, width: HERO_POS[i].labelW }}
+          >
+            <h2
+              className="font-extrabold leading-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)]"
+              style={{ color: "#fff", fontFamily: "var(--font-display)", fontSize: "clamp(.95rem,1.65vw,1.7rem)" }}
+            >
+              <span style={{ color: p.accent }}>{p.name}</span>
+            </h2>
+            <p
+              className="mx-auto mt-1 max-w-[22ch] text-white/85 drop-shadow-[0_1px_6px_rgba(0,0,0,0.7)]"
+              style={{ fontSize: "clamp(.6rem,.95vw,.9rem)" }}
+            >
+              {p.hook}
+            </p>
+            <Link
+              href={p.href}
+              className="mt-2.5 inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 font-semibold text-white shadow-lg transition hover:-translate-y-0.5 hover:opacity-95"
+              style={{ background: p.accent, fontSize: "clamp(.6rem,.9vw,.82rem)" }}
+            >
+              {p.cta}
+              <ArrowRight className="size-3.5" />
+            </Link>
+          </div>
+        ))}
+
+        {/* Product UI composited onto each monitor */}
+        {PRODUCTS.map((p, i) => (
+          <div
+            key={`${p.name}-screen`}
+            className="absolute rounded-[4px] bg-[#0f1a2e]/95 p-1.5 shadow-[0_0_30px_rgba(0,0,0,0.45)] ring-1 ring-white/10"
+            style={{ left: HERO_POS[i].screenLeft, top: HERO_POS[i].screenTop, width: HERO_POS[i].screenW }}
+          >
+            <ProductMock name={p.name} accent={p.accent} />
+          </div>
+        ))}
+      </div>
+
+      {/* < lg — stacked fallback (no photo) */}
+      <div className="lg:hidden" style={{ background: CANVAS }}>
+        <div className="flex items-center justify-between px-5 pt-5">
           <div className="flex items-center gap-2">
-            <div className="grid size-8 place-items-center rounded-lg bg-[#1f306d] text-white">
-              <Sparkles className="size-4" />
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.png" alt="Gameducation" className="size-9" />
             <span className="text-lg font-bold" style={{ color: GBL, fontFamily: "var(--font-display)" }}>
               Gameducation
             </span>
           </div>
-          <p className="hidden flex-1 text-center text-sm text-muted-foreground md:block">
-            One platform. Three ways to make learning unforgettable.
-          </p>
-          <div className="flex items-center gap-3">
-            <Link
-              href="/login"
-              className="rounded-full border border-black/15 px-4 py-2 text-sm font-semibold transition hover:bg-black/5"
-              style={{ color: GBL }}
-            >
-              Start free
-            </Link>
-            <Menu className="size-5 md:hidden" style={{ color: GBL }} />
-          </div>
-        </div>
-      </header>
-
-      {/* TRIFOLD HERO */}
-      <section className="flex flex-col md:flex-row">
-        {PRODUCTS.map((p) => (
-          <div
-            key={p.name}
-            className="group flex flex-1 basis-0 flex-col items-center px-6 py-10 text-center transition-all duration-300 md:min-h-[82vh] md:hover:flex-[1.35]"
-            style={{ background: p.tint }}
+          <Link
+            href="/login"
+            className="rounded-full border border-black/15 px-4 py-2 text-sm font-semibold"
+            style={{ color: GBL }}
           >
-            <h2
-              className="text-2xl font-extrabold tracking-tight md:text-3xl"
-              style={{ color: p.accent, fontFamily: "var(--font-display)" }}
-            >
-              {p.name}
-            </h2>
-            <p className="mt-3 max-w-xs text-lg font-medium" style={{ color: GBL }}>
-              {p.hook}
-            </p>
-
-            <div className="my-7 w-full max-w-sm">
-              <DeviceMock accent={p.accent}>
-                <ProductMock name={p.name} accent={p.accent} />
-              </DeviceMock>
+            Start free
+          </Link>
+        </div>
+        <p className="px-5 pt-4 text-center text-sm text-muted-foreground">
+          One platform. Three ways to make learning unforgettable.
+        </p>
+        <div className="space-y-4 px-5 pb-10 pt-6">
+          {PRODUCTS.map((p) => (
+            <div key={p.name} className="rounded-2xl p-5 text-center" style={{ background: p.tint }}>
+              <h2 className="font-extrabold" style={{ color: p.accent, fontFamily: "var(--font-display)" }}>
+                {p.name}
+              </h2>
+              <p className="mt-1 text-sm" style={{ color: GBL }}>
+                {p.hook}
+              </p>
+              <div className="mx-auto my-4 max-w-xs">
+                <DeviceMock accent={p.accent}>
+                  <ProductMock name={p.name} accent={p.accent} />
+                </DeviceMock>
+              </div>
+              <CTAButton href={p.href} accent={p.accent} className="w-full">
+                {p.cta}
+              </CTAButton>
             </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
 
-            <ul className="mb-7 space-y-2 text-left">
-              {p.bullets.map((b) => (
-                <li key={b} className="flex items-start gap-2 text-sm" style={{ color: GBL }}>
-                  <Check className="mt-0.5 size-4 shrink-0" style={{ color: p.accent }} />
-                  {b}
-                </li>
-              ))}
-            </ul>
-
-            <CTAButton href={p.href} accent={p.accent} className="mt-auto w-full max-w-xs">
-              {p.cta}
-            </CTAButton>
-          </div>
-        ))}
-      </section>
+/* ── Page ──────────────────────────────────────────────────────────────────── */
+export default function LandingPage() {
+  return (
+    <div className="min-h-screen" style={{ background: CANVAS }}>
+      {/* PHOTO HERO (brand + CTA live inside it) */}
+      <PhotoHero />
 
       {/* TRUST BAR */}
       <section className="border-y border-black/5 bg-white">
@@ -640,38 +715,79 @@ function FooterCol({ title, links }: { title: string; links: [string, string][] 
 /* ── Lightweight per-product mock content ──────────────────────────────────── */
 function ProductMock({ name, accent }: { name: string; accent: string }) {
   if (name.startsWith("REKHA")) {
+    const CURVE = "M20 120 Q90 10 140 70 T260 40"
     return (
-      <svg viewBox="0 0 280 150" className="w-full" role="img" aria-label="Desmos graph preview">
+      <svg viewBox="0 0 280 150" className="w-full" role="img" aria-label="Live Desmos graph">
         <rect width="280" height="150" fill="#0f1a2e" rx="6" />
         {[30, 70, 110].map((y) => (
           <line key={y} x1="10" y1={y} x2="270" y2={y} stroke="white" strokeOpacity="0.08" />
         ))}
         <line x1="40" y1="10" x2="40" y2="140" stroke="white" strokeOpacity="0.15" />
         <line x1="10" y1="110" x2="270" y2="110" stroke="white" strokeOpacity="0.15" />
-        <path d="M20 120 Q90 10 140 70 T260 40" fill="none" stroke={accent} strokeWidth="3" />
-        {[
-          [60, 95],
-          [140, 70],
-          [210, 52],
-        ].map(([cx, cy]) => (
-          <circle key={cx} cx={cx} cy={cy} r="4" fill={accent} />
-        ))}
+
+        {/* sweeping scan line */}
+        <line y1="10" y2="140" stroke={accent} strokeOpacity="0.3" strokeWidth="1">
+          <animate attributeName="x1" values="20;260;20" dur="4.8s" repeatCount="indefinite" />
+          <animate attributeName="x2" values="20;260;20" dur="4.8s" repeatCount="indefinite" />
+        </line>
+
+        {/* curve draws itself once on load, then stays plotted */}
+        <path
+          d={CURVE}
+          fill="none"
+          stroke={accent}
+          strokeWidth="3"
+          strokeLinecap="round"
+          pathLength={1}
+          strokeDasharray="1 1"
+          strokeDashoffset={1}
+        >
+          <animate attributeName="stroke-dashoffset" values="1;0" dur="1.4s" repeatCount="1" fill="freeze" />
+        </path>
+
+        {/* plotting head drags back and forth along the curve */}
+        <circle r="7" fill={accent} opacity="0.35">
+          <animateMotion dur="3.6s" repeatCount="indefinite" keyPoints="0;1;0" keyTimes="0;0.5;1" calcMode="linear" path={CURVE} />
+        </circle>
+        <circle r="4" fill="#fff">
+          <animateMotion dur="3.6s" repeatCount="indefinite" keyPoints="0;1;0" keyTimes="0;0.5;1" calcMode="linear" path={CURVE} />
+        </circle>
       </svg>
     )
   }
+
   if (name.startsWith("GAME")) {
     const tiles = ["Flashcards", "Quiz", "Roulette", "Hangman", "Memory", "More"]
     return (
-      <div className="grid grid-cols-3 gap-2">
-        {tiles.map((t) => (
-          <div key={t} className="grid h-12 place-items-center rounded-md bg-white/10 text-[10px] font-medium text-white/80">
-            {t}
+      <div>
+        <div className="mb-2 flex items-center gap-1.5">
+          <span className="hero-pulse inline-block size-1.5 rounded-full bg-red-400" />
+          <span className="text-[9px] font-semibold uppercase tracking-wide text-white/70">Live · 24 playing</span>
+        </div>
+        <div className="relative">
+          <div className="grid grid-cols-3 gap-2">
+            {tiles.map((t, i) => (
+              <div
+                key={t}
+                className="hero-tile grid h-12 place-items-center rounded-md bg-white/10 text-[10px] font-medium text-white/80"
+                style={{ animationDelay: `${i * 0.3}s` }}
+              >
+                {t}
+              </div>
+            ))}
           </div>
-        ))}
+          {/* roaming "player" cursor that hops tile to tile */}
+          <span
+            className="hero-hop pointer-events-none absolute size-3 rounded-full ring-2 ring-white/80"
+            style={{ background: accent, transform: "translate(-50%,-50%)" }}
+            aria-hidden="true"
+          />
+        </div>
       </div>
     )
   }
-  // Strandhoot — quiz / leaderboard mock
+
+  // Strandhoot — quiz / leaderboard mock with a live timer + leader activity
   const rows = [
     ["Aanya", "3500"],
     ["Rohan", "3200"],
@@ -679,11 +795,21 @@ function ProductMock({ name, accent }: { name: string; accent: string }) {
   ]
   return (
     <div className="space-y-2">
-      <div className="rounded-md px-3 py-2 text-[11px] font-semibold text-white" style={{ background: accent }}>
+      <div
+        className="relative overflow-hidden rounded-md px-3 py-2 text-[11px] font-semibold text-white"
+        style={{ background: accent }}
+      >
         Which describes Newton&apos;s First Law?
+        {/* depleting quiz timer */}
+        <span className="hero-timer absolute bottom-0 left-0 h-[3px] rounded-full bg-white/85" />
       </div>
       {rows.map(([n, s], i) => (
-        <div key={n} className="flex items-center justify-between rounded-md bg-white/10 px-3 py-1.5 text-[11px] text-white/85">
+        <div
+          key={n}
+          className={`relative flex items-center justify-between overflow-hidden rounded-md bg-white/10 px-3 py-1.5 text-[11px] text-white/85 ${
+            i === 0 ? "hero-row-glow" : ""
+          }`}
+        >
           <span className="flex items-center gap-2">
             <Trophy className="size-3" style={{ color: i === 0 ? "#f5c000" : "rgba(255,255,255,.5)" }} />
             {n}
@@ -691,6 +817,9 @@ function ProductMock({ name, accent }: { name: string; accent: string }) {
           <span className="font-bold" style={{ color: "#f5c000" }}>
             {s}
           </span>
+          {i === 0 && (
+            <span className="hero-shimmer pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-white/20" aria-hidden="true" />
+          )}
         </div>
       ))}
     </div>

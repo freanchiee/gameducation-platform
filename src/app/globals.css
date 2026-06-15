@@ -167,3 +167,64 @@
     @apply font-sans;
   }
 }
+
+/* ── Landing hero — live on-screen graphics ─────────────────────────────────
+   Pure-CSS motion for the product UIs composited onto the hero monitors. The
+   graph (Rekhachitra) animates via inline SVG SMIL; tiles + leaderboard use
+   these keyframes. All disabled under prefers-reduced-motion. */
+@keyframes hero-tile-wave {
+  0%, 100% { opacity: 0.65; transform: scale(1); }
+  50%      { opacity: 1;    transform: scale(1.06); }
+}
+@keyframes hero-hop {
+  0%   { top: 25%; left: 17%; }
+  16%  { top: 25%; left: 50%; }
+  33%  { top: 25%; left: 83%; }
+  50%  { top: 75%; left: 83%; }
+  66%  { top: 75%; left: 50%; }
+  83%  { top: 75%; left: 17%; }
+  100% { top: 25%; left: 17%; }
+}
+@keyframes hero-timer {
+  0%   { width: 100%; }
+  92%  { width: 5%; }
+  100% { width: 5%; }
+}
+@keyframes hero-row-glow {
+  0%, 100% { box-shadow: inset 0 0 0 0 rgba(245, 192, 0, 0); }
+  50%      { box-shadow: inset 0 0 14px 0 rgba(245, 192, 0, 0.45); }
+}
+@keyframes hero-shimmer {
+  0%       { transform: translateX(-140%) skewX(-12deg); }
+  60%, 100% { transform: translateX(420%) skewX(-12deg); }
+}
+@keyframes hero-pulse {
+  0%, 100% { opacity: 0.35; transform: scale(0.8); }
+  50%      { opacity: 1;    transform: scale(1.2); }
+}
+
+/* Hero background cross-fade: hold image A ~6s, fade to image B ~6s, repeat. */
+@keyframes hero-crossfade {
+  0%, 42%  { opacity: 0; }
+  50%, 92% { opacity: 1; }
+  100%     { opacity: 0; }
+}
+.hero-crossfade { animation: hero-crossfade 12s ease-in-out infinite; }
+
+.hero-tile     { animation: hero-tile-wave 2.4s ease-in-out infinite; }
+.hero-hop      { animation: hero-hop 5.4s ease-in-out infinite; }
+.hero-timer    { animation: hero-timer 5s linear infinite; }
+.hero-row-glow { animation: hero-row-glow 2.6s ease-in-out infinite; }
+.hero-shimmer  { animation: hero-shimmer 3.4s ease-in-out infinite; }
+.hero-pulse    { animation: hero-pulse 1.3s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-tile,
+  .hero-hop,
+  .hero-timer,
+  .hero-row-glow,
+  .hero-shimmer,
+  .hero-pulse { animation: none !important; }
+  /* hold the first photo only — no shuffle */
+  .hero-crossfade { animation: none !important; opacity: 0 !important; }
+}
