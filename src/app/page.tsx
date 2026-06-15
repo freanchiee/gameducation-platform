@@ -120,10 +120,12 @@ function CTAButton({
    monitor (centered via -translate-x-1/2); `screen*` lays the product UI ONTO the
    monitor (left = left edge). Tune these against the screenshot after the image
    file is in place. Order matches PRODUCTS: Rekhachitra, GBL, Strandhoot. */
+// `labelColor` is a brightened variant of each product accent so the label text
+// stays legible on the dark photo (navy/teal accents vanish otherwise).
 const HERO_POS = [
-  { labelLeft: "22%", labelTop: "14%", labelW: "22%", screenLeft: "11.4%", screenTop: "33%", screenW: "22%" },
-  { labelLeft: "49%", labelTop: "18.5%", labelW: "23%", screenLeft: "37.8%", screenTop: "33%", screenW: "22%" },
-  { labelLeft: "73%", labelTop: "14%", labelW: "22%", screenLeft: "61.8%", screenTop: "33%", screenW: "22%" },
+  { labelLeft: "22%", labelTop: "14.5%", labelW: "22%", labelColor: "#3fbdd1", screenLeft: "11.4%", screenTop: "33%", screenW: "22%" },
+  { labelLeft: "49%", labelTop: "14.5%", labelW: "23%", labelColor: "#8fb0f0", screenLeft: "37.8%", screenTop: "33%", screenW: "22%" },
+  { labelLeft: "73%", labelTop: "14.5%", labelW: "22%", labelColor: "#74c878", screenLeft: "61.8%", screenTop: "33%", screenW: "22%" },
 ] as const
 
 function PhotoHero() {
@@ -134,7 +136,7 @@ function PhotoHero() {
         <HeroImage />
 
         {/* Brand + tagline (top-center) */}
-        <div className="pointer-events-none absolute inset-x-0 top-[3%] flex flex-col items-center text-center">
+        <div className="pointer-events-none absolute inset-x-0 top-[2%] flex flex-col items-center text-center">
           <div className="flex items-center gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -177,7 +179,7 @@ function PhotoHero() {
               className="font-extrabold leading-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)]"
               style={{ color: "#fff", fontFamily: "var(--font-display)", fontSize: "clamp(.95rem,1.65vw,1.7rem)" }}
             >
-              <span style={{ color: p.accent }}>{p.name}</span>
+              <span style={{ color: HERO_POS[i].labelColor }}>{p.name}</span>
             </h2>
             <p
               className="mx-auto mt-1 max-w-[22ch] text-white/85 drop-shadow-[0_1px_6px_rgba(0,0,0,0.7)]"
