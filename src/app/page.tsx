@@ -124,7 +124,7 @@ function CTAButton({
 // stays legible on the dark photo (navy/teal accents vanish otherwise).
 const HERO_POS = [
   { labelLeft: "22%", labelTop: "14.5%", labelW: "22%", labelColor: "#3fbdd1", screenLeft: "11.4%", screenTop: "33%", screenW: "22%" },
-  { labelLeft: "49%", labelTop: "14.5%", labelW: "23%", labelColor: "#8fb0f0", screenLeft: "37.8%", screenTop: "33%", screenW: "22%" },
+  { labelLeft: "49%", labelTop: "14.5%", labelW: "23%", labelColor: "#8fb0f0", screenLeft: "37.8%", screenTop: "31%", screenW: "22%" },
   { labelLeft: "73%", labelTop: "14.5%", labelW: "22%", labelColor: "#74c878", screenLeft: "61.8%", screenTop: "33%", screenW: "22%" },
 ] as const
 
@@ -205,7 +205,7 @@ function PhotoHero() {
             className="absolute rounded-[4px] bg-[#0f1a2e]/95 p-1.5 shadow-[0_0_30px_rgba(0,0,0,0.45)] ring-1 ring-white/10"
             style={{ left: HERO_POS[i].screenLeft, top: HERO_POS[i].screenTop, width: HERO_POS[i].screenW }}
           >
-            <ProductMock name={p.name} accent={p.accent} />
+            <ProductMock name={p.name} accent={p.accent} compact={p.name.startsWith("GAME")} />
           </div>
         ))}
       </div>
@@ -715,7 +715,7 @@ function FooterCol({ title, links }: { title: string; links: [string, string][] 
 }
 
 /* ── Lightweight per-product mock content ──────────────────────────────────── */
-function ProductMock({ name, accent }: { name: string; accent: string }) {
+function ProductMock({ name, accent, compact = false }: { name: string; accent: string; compact?: boolean }) {
   if (name.startsWith("REKHA")) {
     const CURVE = "M20 120 Q90 10 140 70 T260 40"
     return (
@@ -760,6 +760,29 @@ function ProductMock({ name, accent }: { name: string; accent: string }) {
 
   if (name.startsWith("GAME")) {
     const tiles = ["Flashcards", "Quiz", "Roulette", "Hangman", "Memory", "More"]
+    // Compact lobby card for the centre monitor, whose lower half is hidden
+    // behind the student — keep it short so it never overlaps their head.
+    if (compact) {
+      return (
+        <div>
+          <div className="mb-1.5 flex items-center gap-1.5">
+            <span className="hero-pulse inline-block size-1.5 rounded-full bg-red-400" />
+            <span className="text-[9px] font-semibold uppercase tracking-wide text-white/70">Live · 24 playing</span>
+          </div>
+          <div className="grid grid-cols-3 gap-1.5">
+            {tiles.slice(0, 3).map((t, i) => (
+              <div
+                key={t}
+                className="hero-tile grid h-8 place-items-center rounded-md bg-white/10 text-[9px] font-medium text-white/80"
+                style={{ animationDelay: `${i * 0.3}s` }}
+              >
+                {t}
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
     return (
       <div>
         <div className="mb-2 flex items-center gap-1.5">
