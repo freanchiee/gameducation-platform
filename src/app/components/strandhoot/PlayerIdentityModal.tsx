@@ -61,63 +61,38 @@ export default function PlayerIdentityModal({
   const handleJoin = async () => {
     if (!user?.email || !playerName.trim()) return;
     setLoading(true);
-  
+
     try {
-      // Step 1: Ensure consistent student_id
+      // Stable per-browser student id (a real UUID — responses.student_id is uuid).
       const storedId = localStorage.getItem('student_id');
-      const student_id = storedId || uuidv4();
-  
-      if (!storedId) localStorage.setItem('student_id', student_id);
-  
-      // Step 2: Check if participant already exists
-      const { data: existing, error: fetchError } = await supabase
-        .from('participants')
-        .select('*')
-        .eq('session_code', sessionCode)
-        .eq('name', user.email)
-        .maybeSingle();
-  
-      if (fetchError) throw fetchError;
-  
-      if (existing) {
-        // Step 3a: Update existing participant
-        const { error: updateError } = await supabase
-          .from('participants')
-          .update({
-            player_name: playerName,
-            avatar_svg: avatarSvg,
-          })
-          .eq('id', existing.id);
-  
-        if (updateError) throw updateError;
-  
-        onJoinSuccess?.({
-          ...existing,
-          player_name: playerName,
-          avatar_svg: avatarSvg,
-          student_id,
-        });
-      } else {
-        // Step 3b: Insert new participant with consistent UUID
-        const newParticipant: Participant = {
-          id: student_id, // 👈 same ID used across app
+      const student_id = storedId && /^[0-9a-f-]{36}$/i.test(storedId) ? storedId : uuidv4();
+      if (student_id !== storedId) localStorage.setItem('student_id', student_id);
+
+      // strandhoot_participants PK is (session_code, student_id) — upsert merges.
+      const { error: upsertError } = await supabase.from('strandhoot_participants').upsert(
+        {
           session_code: sessionCode,
+          student_id,
           name: user.email ?? '',
           player_name: playerName,
           avatar_svg: avatarSvg,
           role: 'student',
-          joined_at: new Date().toISOString(),
-        };
-  
-        const { error: insertError } = await supabase
-          .from('participants')
-          .insert(newParticipant);
-  
-        if (insertError) throw insertError;
-  
-        onJoinSuccess?.(newParticipant);
-      }
-  
+        },
+        { onConflict: 'session_code,student_id' },
+      );
+
+      if (upsertError) throw upsertError;
+
+      onJoinSuccess?.({
+        id: student_id,
+        session_code: sessionCode,
+        name: user.email ?? '',
+        player_name: playerName,
+        avatar_svg: avatarSvg,
+        role: 'student',
+        joined_at: new Date().toISOString(),
+      });
+
       setLoading(false);
       onClose();
     } catch (err) {

@@ -13,14 +13,18 @@ export function useParticipant(sessionCode: string) {
       localStorage.setItem('student_id', student_id);
     }
 
-    const { error } = await supabase.from('participants').upsert({
-      id: student_id,
-      session_code: sessionCode,
-      player_name: name,
-      avatar_svg,
-      role: 'student',
-      joined_at: new Date().toISOString(),
-    });
+    // strandhoot_participants PK is (session_code, student_id) — upsert merges.
+    const { error } = await supabase.from('strandhoot_participants').upsert(
+      {
+        student_id,
+        session_code: sessionCode,
+        player_name: name,
+        avatar_svg,
+        role: 'student',
+        joined_at: new Date().toISOString(),
+      },
+      { onConflict: 'session_code,student_id' },
+    );
 
     if (!error) {
       console.log(`✅ Joined session ${sessionCode} as ${name}`);

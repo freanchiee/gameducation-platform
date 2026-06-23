@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
@@ -10,9 +10,13 @@ import {
   LayoutDashboard,
   LineChart,
   LogOut,
+  Menu,
+  PanelLeftClose,
+  PanelLeftOpen,
   PencilRuler,
   Radio,
   Users,
+  X,
 } from "lucide-react"
 
 import { createClient } from "@/lib/supabase/client"
@@ -32,20 +36,22 @@ const COMMON: NavItem[] = [
 ]
 
 const STUDENT: NavItem[] = [
-  { label: "Worlds", href: "/cellbook", icon: Boxes },
+  { label: "Worlds", href: "/worlds", icon: Boxes },
   { label: "Games", href: "/your-games", icon: Gamepad2 },
   { label: "Desmos studio", href: "/desmos", icon: LineChart },
   { label: "Join a session", href: "/desmos/join", icon: Radio },
 ]
 
 const TEACHER: NavItem[] = [
-  { label: "Worlds & classes", href: "/teacher/classes", icon: Boxes },
+  { label: "Worlds", href: "/worlds", icon: Boxes },
   { label: "Strandhoot builder", href: "/strandhoot-builder", icon: PencilRuler },
   { label: "Games", href: "/your-games", icon: Gamepad2 },
   { label: "Live sessions", href: "/strandhoot-routes/shared", icon: Radio },
   { label: "Desmos studio", href: "/desmos/dashboard", icon: LineChart },
   { label: "Students", href: "/teacher/classes", icon: Users },
 ]
+
+const COLLAPSE_KEY = "sidebar-collapsed"
 
 export function AppShell({
   email,
@@ -58,8 +64,35 @@ export function AppShell({
 }) {
   const pathname = usePathname()
   const [supabase] = useState(() => createClient())
+  const [collapsed, setCollapsed] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
   const isTeacher = role === "teacher"
   const items = [...COMMON, ...(isTeacher ? TEACHER : STUDENT)]
+
+  useEffect(() => {
+    try {
+      setCollapsed(localStorage.getItem(COLLAPSE_KEY) === "1")
+    } catch {
+      /* ignore */
+    }
+  }, [])
+
+  // Close the mobile drawer on navigation.
+  useEffect(() => {
+    setMobileOpen(false)
+  }, [pathname])
+
+  const toggleCollapsed = () => {
+    setCollapsed((c) => {
+      const next = !c
+      try {
+        localStorage.setItem(COLLAPSE_KEY, next ? "1" : "0")
+      } catch {
+        /* ignore */
+      }
+      return next
+    })
+  }
 
   async function signOut() {
     await supabase.auth.signOut()
@@ -68,18 +101,55 @@ export function AppShell({
 
   return (
     <div className="flex min-h-screen">
-      <aside className="hidden w-64 shrink-0 flex-col border-r bg-sidebar text-sidebar-foreground md:flex">
+      {/* Mobile backdrop */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/40 md:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r bg-sidebar text-sidebar-foreground transition-[transform,width] duration-200 md:static md:z-auto md:translate-x-0",
+          mobileOpen ? "translate-x-0" : "-translate-x-full",
+          collapsed && "md:w-16",
+        )}
+      >
         <div className="flex h-14 items-center gap-2 border-b px-4">
-          <BookOpen className="size-5 text-primary" />
-          <span className="font-semibold">LearnBook</span>
+          <BookOpen className={cn("size-5 shrink-0 text-primary", collapsed && "md:hidden")} />
+          <span className={cn("font-semibold", collapsed && "md:hidden")} style={{ fontFamily: "var(--font-display)" }}>
+            LearnBook
+          </span>
+          {/* Desktop collapse toggle */}
+          <button
+            onClick={toggleCollapsed}
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            className={cn(
+              "hidden rounded-md p-1.5 text-muted-foreground transition hover:bg-sidebar-accent hover:text-foreground md:inline-flex",
+              collapsed ? "md:mx-auto" : "ml-auto",
+            )}
+          >
+            {collapsed ? <PanelLeftOpen className="size-4" /> : <PanelLeftClose className="size-4" />}
+          </button>
+          {/* Mobile close */}
+          <button
+            onClick={() => setMobileOpen(false)}
+            className="ml-auto rounded-md p-1.5 text-muted-foreground hover:bg-sidebar-accent md:hidden"
+          >
+            <X className="size-4" />
+          </button>
         </div>
+
         <nav className="flex-1 space-y-1 p-3">
           {items.map((item) => {
             const active = item.href && pathname === item.href
             const content = (
               <span
+                title={collapsed ? item.label : undefined}
                 className={cn(
                   "flex items-center gap-3 rounded-md px-3 py-2 text-sm",
+                  collapsed && "md:justify-center md:px-0",
                   active
                     ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
                     : item.href
@@ -87,9 +157,9 @@ export function AppShell({
                       : "cursor-default text-muted-foreground",
                 )}
               >
-                <item.icon className="size-4" />
-                <span className="flex-1">{item.label}</span>
-                {item.soon && (
+                <item.icon className="size-4 shrink-0" />
+                <span className={cn("flex-1", collapsed && "md:hidden")}>{item.label}</span>
+                {item.soon && !collapsed && (
                   <Badge variant="secondary" className="text-[10px]">
                     {item.soon}
                   </Badge>
@@ -111,9 +181,21 @@ export function AppShell({
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex h-14 items-center justify-between border-b px-4">
-          <div className="flex items-center gap-2 md:hidden">
-            <BookOpen className="size-5 text-primary" />
-            <span className="font-semibold">LearnBook</span>
+          <div className="flex items-center gap-2">
+            {/* Mobile hamburger */}
+            <button
+              onClick={() => setMobileOpen(true)}
+              className="rounded-md p-1.5 text-muted-foreground hover:bg-muted md:hidden"
+              aria-label="Open menu"
+            >
+              <Menu className="size-5" />
+            </button>
+            <div className="flex items-center gap-2 md:hidden">
+              <BookOpen className="size-5 text-primary" />
+              <span className="font-semibold" style={{ fontFamily: "var(--font-display)" }}>
+                LearnBook
+              </span>
+            </div>
           </div>
           <div className="ml-auto flex items-center gap-3">
             <Badge variant="outline" className="capitalize">

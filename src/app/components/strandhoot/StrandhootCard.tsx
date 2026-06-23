@@ -12,6 +12,8 @@ interface StrandhootCardProps {
   url: string;
   thumbnail?: string;
   code: string;
+  /** Strandhoot slug stored on the session so the lobby can launch it. */
+  slug?: string;
 }
 
 function generateSessionCode(): string {
@@ -23,7 +25,7 @@ function generateSessionCode(): string {
   return code;
 }
 
-export default function StrandhootCard({ title, subject, criteria, url }: StrandhootCardProps) {
+export default function StrandhootCard({ title, subject, criteria, url, slug }: StrandhootCardProps) {
   const { user } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -39,12 +41,13 @@ export default function StrandhootCard({ title, subject, criteria, url }: Strand
     const sessionCode = generateSessionCode();
     console.log('🔧 Attempting to create session with code:', sessionCode);
 
-    const { error } = await supabase.from('sessions').insert([
+    const { error } = await supabase.from('strandhoot_sessions').insert([
       {
         session_code: sessionCode,
         created_by: user.id,
+        strandhoot: slug ?? url.split('/').filter(Boolean).pop() ?? '',
         strandhoot_title: title,
-        strandhoot_url: url, // ✅ Save the actual game URL for the session
+        status: 'lobby',
       }
     ]);
 

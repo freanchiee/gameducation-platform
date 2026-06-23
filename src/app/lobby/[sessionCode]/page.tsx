@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { Copy, Check } from 'lucide-react';
 import { supabase } from '@/utils/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import PlayerIdentityModal from '@/app/components/strandhoot/PlayerIdentityModal';
@@ -21,8 +22,12 @@ export default function LobbyPage() {
   const [showIdentityModal, setShowIdentityModal] = useState(false);
   const [currentParticipant, setCurrentParticipant] = useState<Participant | null>(null);
   const [audioPlaying, setAudioPlaying] = useState(true);
+  const [copied, setCopied] = useState(false);
+  const [origin, setOrigin] = useState('');
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const hasStartedRef = useRef(false);
+
+  useEffect(() => { setOrigin(window.location.origin); }, []);
 
   // 🎵 Autoplay music
   useEffect(() => {
@@ -56,18 +61,20 @@ export default function LobbyPage() {
     const fetchSelf = async () => {
       if (role === 'student' && user && sessionCode) {
         const { data } = await supabase
-          .from('participants')
+          .from('strandhoot_participants')
           .select('*')
           .eq('session_code', sessionCode as string)
           .eq('name', user.email)
           .maybeSingle();
 
         if (data) {
-          setCurrentParticipant(data);
-          console.log('👤 Student ID:', data.id); // ✅ log student ID
-          if (!data.player_name || !data.avatar_svg) {
-            setShowIdentityModal(true);
-          }
+          setCurrentParticipant({
+            id: data.student_id,
+            player_name: data.player_name,
+            role: data.role ?? 'student',
+            avatar_svg: data.avatar_svg ?? undefined,
+          });
+          if (!data.player_name || !data.avatar_svg) setShowIdentityModal(true);
         } else {
           setShowIdentityModal(true);
         }
@@ -77,30 +84,36 @@ export default function LobbyPage() {
     fetchSelf();
   }, [user, role, sessionCode]);
 
-  // ✅ Redirect once if session is started (Students only)
+  // ✅ Students: poll session status; when the teacher starts, launch the
+  // internal native engine (or legacy embed) for the session's strandhoot.
   useEffect(() => {
-    const checkAndRedirect = async () => {
-      if (!sessionCode || role !== 'student' || !currentParticipant?.player_name || !currentParticipant?.id) return;
+    if (!sessionCode || role !== 'student' || !currentParticipant?.player_name || !currentParticipant?.id) return;
 
+    let stop = false;
+    const check = async () => {
       const { data } = await supabase
-        .from('sessions')
+        .from('strandhoot_sessions')
         .select('status, strandhoot')
-        .eq('session_code', sessionCode)
-        .single();
+        .eq('session_code', sessionCode as string)
+        .maybeSingle();
 
-      if (data?.status === 'started') {
-        const gameUrl = new URL('https://makersapien.github.io/magnetism-crit-c/');
-        gameUrl.searchParams.set('sessionCode', sessionCode as string);
-        gameUrl.searchParams.set('strandhoot', data.strandhoot ?? 'crit-c-magnetism');
-        gameUrl.searchParams.set('name', currentParticipant.player_name);
-        gameUrl.searchParams.set('studentId', currentParticipant.id); // ✅ include student ID
-
-        window.open(gameUrl.toString(), '_blank');
+      if (!stop && data?.status === 'started' && data.strandhoot && !hasStartedRef.current) {
+        hasStartedRef.current = true;
+        const url = new URL(`/strandhoots/play/${data.strandhoot}`, window.location.origin);
+        url.searchParams.set('sessionCode', sessionCode as string);
+        url.searchParams.set('studentId', currentParticipant.id);
+        url.searchParams.set('name', currentParticipant.player_name);
+        router.push(url.pathname + url.search);
       }
     };
 
-    checkAndRedirect();
-  }, [sessionCode, role, currentParticipant?.player_name, currentParticipant?.id]);
+    check();
+    const interval = setInterval(check, 2500);
+    return () => {
+      stop = true;
+      clearInterval(interval);
+    };
+  }, [sessionCode, role, currentParticipant?.player_name, currentParticipant?.id, router]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#f8efc6] to-[#ffe29a] p-6 flex flex-col items-center relative">
@@ -112,56 +125,80 @@ export default function LobbyPage() {
         {audioPlaying ? '🔊 Mute Music' : '🔈 Play Music'}
       </button>
 
-      {/* 🔗 Code Display */}
-      <div className="max-w-2xl w-full text-center">
-        <h1 className="text-4xl font-extrabold text-[#1f3674] mb-2">🎯 Session Code</h1>
-        <p className="text-2xl font-mono text-[#c3282d] bg-white px-4 py-2 rounded shadow inline-block">
-          {sessionCode}
-        </p>
-
+      {/* Main lobby card */}
+      <div className="w-full max-w-2xl">
         {role === 'teacher' ? (
-          <p className="mt-2 text-[#1f3674] text-lg">Share this code with your students!</p>
+          /* ── Teacher view: Kahoot-style join instructions ── */
+          <div className="rounded-3xl bg-white shadow-2xl overflow-hidden">
+            {/* Join URL banner */}
+            <div className="bg-[#1f3674] px-8 py-5 text-center">
+              <p className="text-white/70 text-sm font-medium mb-1">Students go to</p>
+              <div className="flex items-center justify-center gap-2">
+                <span className="text-white text-2xl font-bold tracking-tight">
+                  {origin ? `${origin}/join` : '/join'}
+                </span>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(`${origin}/join`);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                  className="ml-1 text-white/60 hover:text-white transition"
+                  title="Copy join URL"
+                >
+                  {copied ? <Check className="size-5 text-green-400" /> : <Copy className="size-4" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Code + start */}
+            <div className="px-8 py-6 text-center">
+              <p className="text-slate-500 text-sm mb-2">Game PIN</p>
+              <p className="text-6xl font-mono font-extrabold text-[#c3282d] tracking-[0.15em]">
+                {sessionCode}
+              </p>
+
+              <button
+                className="mt-8 w-full bg-green-600 text-white px-6 py-4 rounded-2xl text-lg font-bold hover:bg-green-700 active:scale-95 transition"
+                onClick={async () => {
+                  if (hasStartedRef.current) return;
+                  hasStartedRef.current = true;
+                  const { error } = await supabase
+                    .from('strandhoot_sessions')
+                    .update({ status: 'started' })
+                    .eq('session_code', sessionCode as string);
+                  if (error) {
+                    hasStartedRef.current = false;
+                    console.error('❌ Failed to start session:', error.message);
+                    alert('Something went wrong starting the session.');
+                    return;
+                  }
+                  router.push(`/dashboard/${sessionCode}`);
+                }}
+              >
+                🚀 Start — all students locked in
+              </button>
+            </div>
+          </div>
         ) : (
-          <>
-            <p className="mt-2 text-[#1f3674] text-lg">
-              Welcome,{' '}
-              <span className="font-bold text-blue-800">
-                {currentParticipant?.player_name || 'Friend'} 👋
-              </span>
-            </p>
+          /* ── Student view ── */
+          <div className="rounded-3xl bg-white shadow-xl px-8 py-6 text-center">
+            <p className="text-4xl mb-2">👋</p>
+            <h2 className="text-2xl font-extrabold text-[#1f3674]">
+              {currentParticipant?.player_name || 'Joining…'}
+            </h2>
+            <p className="mt-1 text-slate-500">Waiting for your teacher to start</p>
             <button
               onClick={() => setShowIdentityModal(true)}
-              className="mt-1 text-sm text-blue-600 underline"
+              className="mt-3 text-sm text-blue-600 underline"
             >
-              ✏️ Change Name or Avatar
+              ✏️ Change name or avatar
             </button>
-          </>
-        )}
-
-        {/* Teacher Launch Button */}
-        {role === 'teacher' && (
-          <button
-            className="mt-6 bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition"
-            onClick={async () => {
-              if (hasStartedRef.current) return;
-              hasStartedRef.current = true;
-
-              const { error } = await supabase
-                .from('sessions')
-                .update({ status: 'started' })
-                .eq('session_code', sessionCode as string);
-
-              if (error) {
-                console.error('❌ Failed to start session:', error.message);
-                alert('Something went wrong starting the session.');
-                return;
-              }
-
-              router.push(`/dashboard/${sessionCode}`);
-            }}
-          >
-            🚀 Start Session
-          </button>
+            <div className="mt-4 rounded-xl bg-slate-50 py-3 px-4">
+              <p className="text-xs text-slate-400">Session code</p>
+              <p className="font-mono text-2xl font-bold text-[#c3282d] tracking-widest">{sessionCode}</p>
+            </div>
+          </div>
         )}
       </div>
 

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, Eye, EyeOff, Mail, Lock, ArrowRight, RefreshCw } from "lucide-react";
 import { Button } from "@/desmos/components/ui/Button";
 import { Input } from "@/desmos/components/ui/Input";
+import { createClient } from "@/lib/supabase/client";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -29,6 +30,7 @@ function GoogleIcon() {
 
 export default function LoginPage() {
   const router = useRouter();
+  const [supabase] = useState(() => createClient());
 
   const [mode, setMode]         = useState<AuthMode>("password");
   const [otpStep, setOtpStep]   = useState<OtpStep>("email");
@@ -49,12 +51,9 @@ export default function LoginPage() {
 
   const clearError = () => setError("");
 
-  async function simulateRequest(ms = 900) {
-    await new Promise((r) => setTimeout(r, ms));
-  }
-
   function goToDashboard() {
-    router.push("/dashboard");
+    router.push("/desmos/dashboard");
+    router.refresh();
   }
 
   // ── Google sign-in ────────────────────────────────────────────────────────
@@ -62,10 +61,12 @@ export default function LoginPage() {
   const handleGoogle = async () => {
     setLoading(true);
     clearError();
-    await simulateRequest(800);
-    // In production: redirect to /api/auth/google or supabase signInWithOAuth
-    setLoading(false);
-    goToDashboard();
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/desmos/dashboard` },
+    });
+    // On success the browser is redirected to Google; only reached on error.
+    if (error) { setError(error.message); setLoading(false); }
   };
 
   // ── Email + password ──────────────────────────────────────────────────────
@@ -76,9 +77,9 @@ export default function LoginPage() {
     if (password.length < 6)  { setError("Password must be at least 6 characters"); return; }
     setLoading(true);
     clearError();
-    await simulateRequest();
-    // In production: POST /api/auth/login { email, password }
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
+    if (error) { setError(error.message); return; }
     goToDashboard();
   };
 
@@ -89,9 +90,12 @@ export default function LoginPage() {
     if (!email.includes("@")) { setError("Enter a valid email address"); return; }
     setLoading(true);
     clearError();
-    await simulateRequest();
-    // In production: POST /api/auth/otp/send { email }
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: `${window.location.origin}/desmos/dashboard` },
+    });
     setLoading(false);
+    if (error) { setError(error.message); return; }
     setOtpStep("verify");
   };
 
@@ -102,9 +106,9 @@ export default function LoginPage() {
     if (otp.replace(/\s/g, "").length < 4) { setError("Enter the full code from your email"); return; }
     setLoading(true);
     clearError();
-    await simulateRequest();
-    // In production: POST /api/auth/otp/verify { email, token: otp }
+    const { error } = await supabase.auth.verifyOtp({ email, token: otp.trim(), type: "email" });
     setLoading(false);
+    if (error) { setError(error.message); return; }
     goToDashboard();
   };
 
@@ -118,7 +122,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         {/* Back link */}
         <Link
-          href="/"
+          href="/desmos"
           className="inline-flex items-center gap-1.5 text-sm mb-8 hover:opacity-70 transition-opacity"
           style={{ color: "var(--color-muted)" }}
         >
@@ -384,7 +388,7 @@ export default function LoginPage() {
           <p className="text-xs text-center mt-6" style={{ color: "var(--color-subtle)" }}>
             Students don&apos;t need an account.{" "}
             <Link
-              href="/join"
+              href="/desmos/join"
               className="font-medium hover:underline"
               style={{ color: "var(--color-brand-teal)" }}
             >

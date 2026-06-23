@@ -58,24 +58,6 @@ const steps = [
   },
 ];
 
-const testimonials = [
-  {
-    quote: "My IB MYP students actually ask to do Rekhachitra sessions now. The graph activities are genuinely engaging.",
-    name: "Sarah K.",
-    role: "IB MYP Mathematics Teacher",
-    seed: "sarah",
-  },
-  {
-    quote:
-      "Setup takes 2 minutes. Students join on their phones with no login. It just works — that's all I needed.",
-    name: "Mr. Patel",
-    role: "Grade 9 Math, International School",
-    seed: "patel",
-  },
-];
-
-const avatarColors = ["#1b7888", "#f65e5d", "#2db89e", "#f5c000"];
-
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export default function LandingPage() {
@@ -84,7 +66,7 @@ export default function LandingPage() {
       {/* ── Navigation ─────────────────────────────────────────────────── */}
       <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-[var(--color-border)]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/desmos" className="flex items-center gap-2">
             <div
               className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm"
               style={{ backgroundColor: "var(--color-brand-teal)", fontFamily: "var(--font-heading)" }}
@@ -114,16 +96,16 @@ export default function LandingPage() {
             >
               How it works
             </Link>
-            <Link href="/auth/login" className="btn btn-outline btn-sm">
+            <Link href="/desmos/auth/login" className="btn btn-outline btn-sm">
               Teacher Login
             </Link>
-            <Link href="/dashboard" className="btn btn-primary btn-sm">
+            <Link href="/desmos/dashboard" className="btn btn-primary btn-sm">
               Get Started Free
             </Link>
           </div>
 
           {/* Mobile CTA */}
-          <Link href="/dashboard" className="md:hidden btn btn-primary btn-sm">
+          <Link href="/desmos/dashboard" className="md:hidden btn btn-primary btn-sm">
             Get Started
           </Link>
         </div>
@@ -169,30 +151,19 @@ export default function LandingPage() {
 
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/dashboard" className="btn btn-primary btn-lg w-full sm:w-auto">
+            <Link href="/desmos/dashboard" className="btn btn-primary btn-lg w-full sm:w-auto">
               Start your first activity
               <ArrowRight size={18} />
             </Link>
-            <Link href="/join" className="btn btn-outline btn-lg w-full sm:w-auto">
+            <Link href="/desmos/join" className="btn btn-outline btn-lg w-full sm:w-auto">
               I&apos;m a student →
             </Link>
           </div>
 
-          {/* Social proof */}
-          <div className="flex items-center justify-center gap-6 mt-10">
-            <div className="flex -space-x-2">
-              {avatarColors.map((c, i) => (
-                <div
-                  key={i}
-                  className="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-white text-xs font-bold"
-                  style={{ backgroundColor: c }}
-                >
-                  {["S", "M", "K", "A"][i]}
-                </div>
-              ))}
-            </div>
+          {/* Beta note */}
+          <div className="flex items-center justify-center mt-10">
             <p className="text-sm" style={{ color: "var(--color-muted)" }}>
-              <strong style={{ color: "var(--color-ink)" }}>200+ teachers</strong> already using Rekhachitra
+              <strong style={{ color: "var(--color-ink)" }}>Now in beta</strong> — free for teachers
             </p>
           </div>
         </div>
@@ -375,46 +346,23 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Testimonials ───────────────────────────────────────────────── */}
+      {/* ── Built for IB MYP ───────────────────────────────────────────── */}
       <section className="py-20 px-4 sm:px-6" style={{ backgroundColor: "var(--color-surface)" }}>
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-3xl mx-auto text-center">
           <h2
-            className="text-3xl font-bold text-center mb-10"
+            className="text-3xl sm:text-4xl font-bold mb-4"
             style={{ color: "var(--color-ink)", fontFamily: "var(--font-display)" }}
           >
-            Teachers love it
+            Built for IB MYP teachers
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {testimonials.map((t) => (
-              <div key={t.name} className="card p-6">
-                <p
-                  className="text-base leading-relaxed mb-4"
-                  style={{ color: "var(--color-ink-soft)" }}
-                >
-                  &ldquo;{t.quote}&rdquo;
-                </p>
-                <div className="flex items-center gap-3">
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
-                    style={{
-                      backgroundColor: "var(--color-brand-teal)",
-                      fontFamily: "var(--font-heading)",
-                    }}
-                  >
-                    {t.name[0]}
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold" style={{ color: "var(--color-ink)" }}>
-                      {t.name}
-                    </p>
-                    <p className="text-xs" style={{ color: "var(--color-muted)" }}>
-                      {t.role}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <p
+            className="text-lg leading-relaxed"
+            style={{ color: "var(--color-ink-soft)" }}
+          >
+            Rekhachitra is designed around the way MYP mathematics is actually taught — visual,
+            inquiry-led, and conceptual. Build graph-based activities that surface student thinking,
+            run them live, and respond to misconceptions while they&apos;re still in the room.
+          </p>
         </div>
       </section>
 
@@ -434,14 +382,14 @@ export default function LandingPage() {
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
-            href="/dashboard"
+            href="/desmos/dashboard"
             className="btn btn-yellow btn-lg w-full sm:w-auto"
           >
             Create your first activity
             <ArrowRight size={18} />
           </Link>
           <Link
-            href="/join"
+            href="/desmos/join"
             className="btn btn-lg w-full sm:w-auto text-white border-white/40 hover:bg-white/10"
             style={{ backgroundColor: "transparent", border: "2px solid rgba(255,255,255,0.4)" }}
           >
@@ -466,14 +414,18 @@ export default function LandingPage() {
             </span>
           </div>
           <div className="flex items-center gap-6">
-            {["Features", "Pricing", "Blog", "Contact"].map((item) => (
+            {[
+              { label: "Features", href: "#features" },
+              { label: "Pricing", href: "/desmos/pricing" },
+              { label: "Contact", href: "/desmos/contact" },
+            ].map((item) => (
               <Link
-                key={item}
-                href={`/${item.toLowerCase()}`}
+                key={item.label}
+                href={item.href}
                 className="text-sm hover:opacity-70 transition-opacity"
                 style={{ color: "var(--color-muted)" }}
               >
-                {item}
+                {item.label}
               </Link>
             ))}
           </div>

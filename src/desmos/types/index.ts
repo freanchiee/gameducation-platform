@@ -130,6 +130,9 @@ export interface Activity {
   slides?: Slide[];
   createdAt: string;
   updatedAt: string;
+  /** Sharing: minted on first save. `isPublic` gates whether the link resolves. */
+  shareSlug?: string;
+  forkedFrom?: string | null;
 }
 
 // ── Sessions ──────────────────────────────────────────────────────────────────

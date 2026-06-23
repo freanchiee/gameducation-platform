@@ -30,8 +30,8 @@ const AREAS = [
   },
   {
     title: "Worlds",
-    description: "CellBook, Organistagram, Reactagram, Physigram.",
-    href: "/cellbook",
+    description: "Hosted interactive mini-apps — open and play them in-app.",
+    href: "/worlds",
     roles: ["teacher", "student"],
   },
   {

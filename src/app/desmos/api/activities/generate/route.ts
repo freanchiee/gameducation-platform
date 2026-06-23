@@ -1,6 +1,21 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { generateId } from "@/desmos/lib/utils/session";
 import type { Activity, Slide, Checkpoint } from "@/desmos/types";
+import { createClient } from "@/lib/supabase/server";
+
+// Per-user in-memory rate limit (defense-in-depth behind auth).
+// ponytail: per-instance only — swap for Upstash/Redis if you run multiple instances.
+const RL_MAX = 10;
+const RL_WINDOW_MS = 60_000;
+const rlHits = new Map<string, number[]>();
+function rateLimitOk(userId: string): boolean {
+  const now = Date.now();
+  const recent = (rlHits.get(userId) ?? []).filter((t) => now - t < RL_WINDOW_MS);
+  if (recent.length >= RL_MAX) { rlHits.set(userId, recent); return false; }
+  recent.push(now);
+  rlHits.set(userId, recent);
+  return true;
+}
 
 // ── System prompt ─────────────────────────────────────────────────────────────
 
@@ -280,6 +295,18 @@ function mapSlide(raw: RawSlide, index: number, activityId: string): Slide {
 
 export async function POST(req: Request) {
   try {
+    // Require an authenticated teacher — stops anonymous abuse of the server API key.
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      return Response.json({ error: "Sign in to generate activities." }, { status: 401 });
+    }
+    if (!rateLimitOk(user.id)) {
+      return Response.json({ error: "Too many requests — wait a minute and try again." }, { status: 429 });
+    }
+
     const body = await req.json();
     const { description, objectives, gradeLevel, numSlides, style, provider = "anthropic", apiKey } = body as {
       description: string;

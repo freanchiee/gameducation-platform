@@ -50,6 +50,7 @@ export default function StudentStrandhoots() {
             subject={s.subject || 'General'}
             url={s.url} // ✅ passes url safely
             code={s.slug.toUpperCase()}
+            slug={s.slug}
             thumbnail={s.thumbnail}
           />
         ))}

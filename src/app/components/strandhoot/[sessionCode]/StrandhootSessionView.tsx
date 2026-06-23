@@ -53,7 +53,7 @@ export default function StrandhootLauncher() {
         }
         
         const { data: session, error: sessionError } = await supabase
-          .from('sessions')
+          .from('strandhoot_sessions')
           .select('*')
           .eq('session_code', code)
           .single();

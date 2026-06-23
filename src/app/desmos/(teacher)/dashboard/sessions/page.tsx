@@ -153,7 +153,7 @@ function SessionsPage() {
         className="flex items-center gap-4 px-4 py-3 border-b flex-shrink-0"
         style={{ backgroundColor: "var(--color-white)", borderColor: "var(--color-border)" }}
       >
-        <JoinCodeDisplay code={session.joinCode} url={`${appUrl}/join/${session.joinCode}`} />
+        <JoinCodeDisplay code={session.joinCode} url={`${appUrl}/desmos/join/${session.joinCode}`} />
 
         <div className="flex items-center gap-2 ml-2 flex-1 min-w-0">
           <span className="text-sm font-bold truncate"
@@ -313,7 +313,7 @@ function LiveRoster({ joinCode, totalSlides }: { joinCode: string; totalSlides: 
   const refresh = useCallback(async () => {
     // 1. Try API (cross-device students)
     try {
-      const res = await fetch(`/api/live/${normCode(joinCode)}`);
+      const res = await fetch(`/desmos/api/live/${normCode(joinCode)}`);
       if (res.ok) {
         const data = await res.json() as { students?: Record<string, StudentProgressData> };
         if (data.students) {

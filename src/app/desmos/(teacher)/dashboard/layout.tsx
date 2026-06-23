@@ -8,9 +8,9 @@ export const metadata: Metadata = {
 };
 
 const navItems = [
-  { href: "/dashboard", icon: LayoutDashboard, label: "Overview" },
-  { href: "/dashboard/activities", icon: BookOpen, label: "Activities" },
-  { href: "/dashboard/sessions", icon: PlayCircle, label: "Sessions" },
+  { href: "/desmos/dashboard", icon: LayoutDashboard, label: "Overview" },
+  { href: "/desmos/dashboard/activities", icon: BookOpen, label: "Activities" },
+  { href: "/desmos/dashboard/sessions", icon: PlayCircle, label: "Sessions" },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -23,7 +23,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       >
         {/* Logo */}
         <div className="p-5 border-b" style={{ borderColor: "var(--color-border)" }}>
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/desmos" className="flex items-center gap-2">
             <div
               className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm"
               style={{ backgroundColor: "var(--color-brand-teal)", fontFamily: "var(--font-heading)" }}
@@ -71,7 +71,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 teacher@school.edu
               </p>
             </div>
-            <Link href="/auth/login" title="Sign out">
+            <Link href="/desmos/auth/login" title="Sign out">
               <LogOut size={15} style={{ color: "var(--color-muted)" }} />
             </Link>
           </div>

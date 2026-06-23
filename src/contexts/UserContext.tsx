@@ -251,29 +251,36 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   // Listen for Supabase auth changes
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      // Must stay SYNCHRONOUS — awaiting a supabase call here holds the GoTrue
+      // navigator lock and deadlocks other queries (host-session insert hangs).
+      // Set the synchronous fields now; defer the profile fetch with setTimeout.
+      (event, session) => {
         console.log('🔄 Auth state changed:', event, session?.user?.id);
-        
-        if (event === 'SIGNED_IN' && session?.user) {
-          // User signed in - update context but don't trigger full re-initialization
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', session.user.id)
-            .single();
 
-          setUserId(session.user.id);
-          setUserEmail(session.user.email || null);
-          setUserName(session.user.user_metadata?.full_name || session.user.user_metadata?.name || null);
-          setUserRole((profile?.role as "teacher" | "student" | null) || null);
-          
+        if (event === 'SIGNED_IN' && session?.user) {
+          const u = session.user;
+          // User signed in - update context but don't trigger full re-initialization
+          setUserId(u.id);
+          setUserEmail(u.email || null);
+          setUserName(u.user_metadata?.full_name || u.user_metadata?.name || null);
+
           // Persist to storage
-          localStorage.setItem('currentUserId', session.user.id);
-          if (session.user.email) localStorage.setItem('userEmail', session.user.email);
-          
+          localStorage.setItem('currentUserId', u.id);
+          if (u.email) localStorage.setItem('userEmail', u.email);
+
           hasInitialized.current = true;
           setIsLoading(false);
-          
+
+          // Role fetch deferred outside the auth-lock to avoid the deadlock.
+          setTimeout(async () => {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('role')
+              .eq('id', u.id)
+              .maybeSingle();
+            setUserRole((profile?.role as "teacher" | "student" | null) || null);
+          }, 0);
+
         } else if (event === 'SIGNED_OUT') {
           // User signed out, clear our context
           clearUser();

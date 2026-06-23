@@ -26,7 +26,7 @@ function writeLiveSession(session: Session, activity: Activity) {
     );
   } catch { /* quota exceeded */ }
   // API relay — works across different browsers and devices
-  fetch(`/api/live/${session.joinCode.toLowerCase()}`, {
+  fetch(`/desmos/api/live/${session.joinCode.toLowerCase()}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ session, activity }),
@@ -46,7 +46,7 @@ function patchLiveSession(joinCode: string, patch: Partial<Session>) {
     }
   } catch { /* quota exceeded */ }
   // API relay
-  fetch(`/api/live/${joinCode.toLowerCase()}`, {
+  fetch(`/desmos/api/live/${joinCode.toLowerCase()}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ session: patch }),

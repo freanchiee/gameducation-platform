@@ -40,3 +40,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Vendored strandhoot apps — commit source + public build, not deps/build dirs
+strandhoots/**/node_modules
+strandhoots/**/dist
+strandhoots/**/build
+strandhoots/**/.env.production

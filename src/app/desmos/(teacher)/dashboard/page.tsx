@@ -47,7 +47,7 @@ export default function DashboardOverviewPage() {
             Here&apos;s your classroom overview
           </p>
         </div>
-        <Link href="/dashboard/activities/new" className="btn btn-primary gap-2">
+        <Link href="/desmos/dashboard/activities/new" className="btn btn-primary gap-2">
           <Plus size={16} />
           New Activity
         </Link>
@@ -81,7 +81,7 @@ export default function DashboardOverviewPage() {
       {/* Quick actions */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
         <Link
-          href="/dashboard/activities/new"
+          href="/desmos/dashboard/activities/new"
           className="card p-6 flex items-center gap-4 hover:shadow-brand transition-shadow group"
         >
           <div
@@ -105,7 +105,7 @@ export default function DashboardOverviewPage() {
         </Link>
 
         <Link
-          href="/dashboard/activities"
+          href="/desmos/dashboard/activities"
           className="card p-6 flex items-center gap-4 hover:shadow-brand transition-shadow group"
         >
           <div
@@ -146,7 +146,7 @@ export default function DashboardOverviewPage() {
         <p className="text-sm mb-4" style={{ color: "var(--color-muted)" }}>
           Create an activity and launch your first live session to see analytics here.
         </p>
-        <Link href="/dashboard/activities/new" className="btn btn-primary btn-sm">
+        <Link href="/desmos/dashboard/activities/new" className="btn btn-primary btn-sm">
           <Plus size={14} />
           Create first activity
         </Link>

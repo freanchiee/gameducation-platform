@@ -137,7 +137,7 @@ export default function GenerateActivityPage() {
     }, 1800);
 
     try {
-      const res = await fetch("/api/activities/generate", {
+      const res = await fetch("/desmos/api/activities/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ description, objectives, gradeLevel, numSlides, style, provider, apiKey }),
@@ -162,7 +162,7 @@ export default function GenerateActivityPage() {
   const handleOpenInBuilder = () => {
     if (!generated) return;
     setPendingActivity(generated);
-    router.push("/dashboard/activities/new");
+    router.push("/desmos/dashboard/activities/new");
   };
 
   // ── Render phases ─────────────────────────────────────────────────────────
@@ -174,7 +174,7 @@ export default function GenerateActivityPage() {
         className="sticky top-0 z-10 flex items-center gap-3 px-6 py-3 border-b"
         style={{ backgroundColor: "var(--color-white)", borderColor: "var(--color-border)" }}
       >
-        <Link href="/dashboard/activities" className="p-1.5 rounded-lg transition-colors"
+        <Link href="/desmos/dashboard/activities" className="p-1.5 rounded-lg transition-colors"
           style={{ color: "var(--color-muted)" }}>
           <ArrowLeft size={18} />
         </Link>

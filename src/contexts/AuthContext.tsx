@@ -65,42 +65,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     initializeAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      // IMPORTANT: this callback must stay SYNCHRONOUS. Awaiting any supabase
+      // call here holds the GoTrue navigator lock and deadlocks every other
+      // query (e.g. the "Host live session" insert hangs forever). Defer all
+      // supabase work with setTimeout(…, 0) so the lock is released first.
+      // See supabase-js #762 / auth-js navigatorLock docs.
+      (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         setIsLoading(false);
 
         if (event === 'SIGNED_IN' && session?.user) {
-          const { data, error } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', session.user.id)
-            .single();
+          const signedInUser = session.user;
+          setTimeout(async () => {
+            const { data, error } = await supabase
+              .from('profiles')
+              .select('role')
+              .eq('id', signedInUser.id)
+              .maybeSingle();
 
-          if ((!data || error || !data.role) && typeof window !== 'undefined') {
-            const savedRole = localStorage.getItem('gameducation-role') as 'teacher' | 'student' | null;
+            if ((!data || error || !data.role) && typeof window !== 'undefined') {
+              const savedRole = localStorage.getItem('gameducation-role') as 'teacher' | 'student' | null;
 
-            if (savedRole) {
-              await supabase.from('profiles').upsert(
-                { id: session.user.id, role: savedRole },
-                { onConflict: 'id' }
-              );
-              setRole(savedRole);
-              toast.success(`🎉 Logged in as ${savedRole.toUpperCase()}`);
-              localStorage.removeItem('gameducation-role');
+              if (savedRole) {
+                await supabase.from('profiles').upsert(
+                  { id: signedInUser.id, role: savedRole },
+                  { onConflict: 'id' }
+                );
+                setRole(savedRole);
+                toast.success(`🎉 Logged in as ${savedRole.toUpperCase()}`);
+                localStorage.removeItem('gameducation-role');
+              } else {
+                console.warn('No role found in Supabase or localStorage');
+                window.location.href = '/choose-role';
+                return;
+              }
             } else {
-              console.warn('No role found in Supabase or localStorage');
-              window.location.href = '/choose-role';
-              return;
+              setRole((data?.role as "teacher" | "student" | null) ?? null);
             }
-          } else {
-            setRole((data?.role as "teacher" | "student" | null) ?? null);
-          }
 
-          // Optional redirect
-          if (window.location.pathname === '/') {
-            router.push('/dashboard');
-          }
+            // Optional redirect
+            if (window.location.pathname === '/') {
+              router.push('/dashboard');
+            }
+          }, 0);
         }
       }
     );
@@ -117,7 +125,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .from('profiles')
           .select('role')
           .eq('id', user.id)
-          .single();
+          .maybeSingle();
 
         if (error) {
           console.error('❌ Failed to fetch role after refresh:', error.message);

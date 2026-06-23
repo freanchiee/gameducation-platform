@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Plus, Clock, Sparkles, Layers, Trash2, Edit2, Rocket } from "lucide-react";
+import { Plus, Clock, Sparkles, Layers, Trash2, Edit2, Rocket, Share2, Check } from "lucide-react";
 import { Badge } from "@/desmos/components/ui/Badge";
 import type { Activity, ActivityStatus } from "@/desmos/types";
 import {
   listActivities,
   deleteActivity,
   saveActivity,
+  shareActivity,
 } from "@/desmos/lib/activities-store";
 
 const statusVariant: Record<ActivityStatus, "neutral" | "mint" | "teal"> = {
@@ -49,6 +50,17 @@ export default function ActivitiesPage() {
     setActivities((prev) => prev.map((a) => (a.id === id ? updated : a)));
   };
 
+  // Mark the activity public, mint a slug if needed, then copy the /desmos/a/<slug> link.
+  const handleShare = async (activity: Activity): Promise<void> => {
+    const shared = await shareActivity(activity);
+    setActivities((prev) => prev.map((a) => (a.id === shared.id ? shared : a)));
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}/desmos/a/${shared.shareSlug}`);
+    } catch {
+      /* clipboard blocked — link is still on the share page */
+    }
+  };
+
   return (
     <div className="p-8 max-w-5xl">
       {/* Header */}
@@ -64,18 +76,18 @@ export default function ActivitiesPage() {
             {loaded ? (
               activities.length === 0
                 ? "No activities yet — create one below"
-                : `${activities.length} activit${activities.length === 1 ? "y" : "ies"} saved locally`
+                : `${activities.length} activit${activities.length === 1 ? "y" : "ies"} in your library`
             ) : (
               "Loading…"
             )}
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Link href="/dashboard/activities/generate" className="btn btn-outline gap-2">
+          <Link href="/desmos/dashboard/activities/generate" className="btn btn-outline gap-2">
             <Sparkles size={16} />
             Generate with AI
           </Link>
-          <Link href="/dashboard/activities/new" className="btn btn-primary gap-2">
+          <Link href="/desmos/dashboard/activities/new" className="btn btn-primary gap-2">
             <Plus size={16} />
             New Activity
           </Link>
@@ -98,11 +110,12 @@ export default function ActivitiesPage() {
               activity={activity}
               onDelete={() => handleDelete(activity.id)}
               onStatusChange={(status) => handleStatusChange(activity.id, status)}
+              onShare={() => handleShare(activity)}
             />
           ))}
           {/* Create new card */}
           <Link
-            href="/dashboard/activities/new"
+            href="/desmos/dashboard/activities/new"
             className="card flex flex-col items-center justify-center p-8 min-h-44 border-dashed hover:shadow-brand transition-shadow text-center group"
             style={{ borderStyle: "dashed" }}
           >
@@ -134,11 +147,11 @@ export default function ActivitiesPage() {
             They&apos;re saved automatically in your browser.
           </p>
           <div className="flex items-center justify-center gap-3">
-            <Link href="/dashboard/activities/generate" className="btn btn-outline gap-2">
+            <Link href="/desmos/dashboard/activities/generate" className="btn btn-outline gap-2">
               <Sparkles size={16} />
               Generate with AI
             </Link>
-            <Link href="/dashboard/activities/new" className="btn btn-primary gap-2">
+            <Link href="/desmos/dashboard/activities/new" className="btn btn-primary gap-2">
               <Plus size={16} />
               Create activity
             </Link>
@@ -149,7 +162,7 @@ export default function ActivitiesPage() {
       {/* Storage notice */}
       {loaded && activities.length > 0 && (
         <p className="mt-6 text-xs text-center" style={{ color: "var(--color-subtle)" }}>
-          Activities are saved in your browser&apos;s local storage. They persist across sessions on this device.
+          Activities are saved to your account and shareable by link — hit Share to copy a public link any teacher can open or copy.
         </p>
       )}
     </div>
@@ -160,14 +173,23 @@ function ActivityCard({
   activity,
   onDelete,
   onStatusChange,
+  onShare,
 }: {
   activity: Activity;
   onDelete: () => void;
   onStatusChange: (status: ActivityStatus) => void;
+  onShare: () => void | Promise<void>;
 }) {
   const slideCount = activity.slides?.length ?? 0;
   const blockCount = activity.slides?.reduce((sum, s) => sum + (s.content?.length ?? 0), 0) ?? 0;
   const isDraft = activity.status === "draft";
+  const [copied, setCopied] = useState(false);
+
+  const share = async () => {
+    await onShare();
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1800);
+  };
 
   return (
     <div className="card p-5 flex flex-col gap-3 hover:shadow-brand transition-shadow group">
@@ -219,11 +241,21 @@ function ActivityCard({
 
       {/* Action buttons */}
       <div className="flex gap-2 pt-1">
-        <Link href={`/dashboard/activities/new?id=${activity.id}`}
+        <Link href={`/desmos/dashboard/activities/new?id=${activity.id}`}
           className="btn btn-outline btn-sm gap-1.5">
           <Edit2 size={13} />
           Edit
         </Link>
+
+        <button
+          onClick={share}
+          className="btn btn-outline btn-sm gap-1.5"
+          title="Copy share link"
+          aria-label="Copy share link"
+        >
+          {copied ? <Check size={13} style={{ color: "var(--color-brand-mint)" }} /> : <Share2 size={13} />}
+          {copied ? "Copied" : "Share"}
+        </button>
 
         {isDraft ? (
           <button
@@ -244,7 +276,7 @@ function ActivityCard({
           </button>
         )}
 
-        <Link href={`/dashboard/sessions?activity=${activity.id}`}
+        <Link href={`/desmos/dashboard/sessions?activity=${activity.id}`}
           className="btn btn-primary btn-sm gap-1.5">
           Launch
         </Link>

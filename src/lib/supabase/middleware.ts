@@ -37,7 +37,14 @@ export async function updateSession(request: NextRequest) {
   })
 
   // IMPORTANT: do not run logic between createServerClient and getUser().
-  await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  // Gate the desmos (Rekhachitra) teacher dashboard: signed-out → login.
+  if (request.nextUrl.pathname.startsWith("/desmos/dashboard") && !user) {
+    return NextResponse.redirect(new URL("/desmos/auth/login", request.url))
+  }
 
   return response
 }

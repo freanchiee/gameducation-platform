@@ -20,6 +20,7 @@ type Status = "idle" | "sending" | "sent" | "error"
 export default function LoginPage() {
   const [supabase] = useState(() => createClient())
   const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
   const [status, setStatus] = useState<Status>("idle")
   const [error, setError] = useState("")
 
@@ -47,6 +48,20 @@ export default function LoginPage() {
     })
     // Only set on error; success navigates away.
     if (error) setError(error.message)
+  }
+
+  // Email + password (test/admin accounts; magic link stays the default).
+  async function signInWithPassword(e: React.FormEvent) {
+    e.preventDefault()
+    setStatus("sending")
+    setError("")
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) {
+      setStatus("error")
+      setError(error.message)
+    } else {
+      window.location.href = "/dashboard"
+    }
   }
 
   return (
@@ -107,9 +122,28 @@ export default function LoginPage() {
               >
                 Continue with Google
               </Button>
-              <p className="text-center text-xs text-muted-foreground">
-                Google sign-in requires the provider to be enabled in Supabase.
-              </p>
+
+              {/* Password sign-in — for test/admin accounts. */}
+              <form onSubmit={signInWithPassword} className="space-y-2 border-t pt-4">
+                <Label htmlFor="password" className="text-xs text-muted-foreground">
+                  Or sign in with a password (test accounts)
+                </Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <Button
+                  type="submit"
+                  variant="secondary"
+                  className="w-full"
+                  disabled={!email || !password || status === "sending"}
+                >
+                  Sign in with password
+                </Button>
+              </form>
             </>
           )}
 

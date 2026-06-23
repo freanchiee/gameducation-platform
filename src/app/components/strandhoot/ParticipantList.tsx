@@ -5,9 +5,10 @@ import { supabase } from '@/utils/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
 
 type Participant = {
-  id: string;
+  student_id: string;
   player_name: string;
   avatar_svg?: string;
+  role?: string;
 };
 
 type Props = {
@@ -20,12 +21,12 @@ export default function ParticipantList({ sessionCode }: Props) {
   useEffect(() => {
     const fetchParticipants = async () => {
       const { data } = await supabase
-        .from('participants')
+        .from('strandhoot_participants')
         .select('*')
         .eq('session_code', sessionCode)
         .order('joined_at', { ascending: true }); // optional: sort by join time
 
-      if (data) setParticipants(data);
+      if (data) setParticipants(data.filter((p) => p.role !== 'teacher'));
     };
 
     // 🧨 Nuclear Option: poll every 2 seconds
@@ -40,7 +41,7 @@ export default function ParticipantList({ sessionCode }: Props) {
       <AnimatePresence>
         {participants.map((p) => (
           <motion.div
-            key={p.id}
+            key={p.student_id}
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}

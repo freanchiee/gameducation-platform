@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { v4 as uuidv4 } from 'uuid';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/utils/supabase';
 import { useAuth } from '@/contexts/AuthContext';
@@ -57,13 +56,12 @@ export default function StrandhootModal({ isOpen, onClose }: StrandhootModalProp
     const sessionCode = Math.random().toString(36).substring(2, 8).toUpperCase();
 
     try {
-      const { error } = await supabase.from('sessions').insert({
-        id: uuidv4(),
+      const { error } = await supabase.from('strandhoot_sessions').insert({
         session_code: sessionCode,
         strandhoot: strandhoot.slug,
         strandhoot_title: strandhoot.name,
-        created_at: new Date().toISOString(),
         created_by: user.id,
+        status: 'lobby',
       });
 
       if (error) {

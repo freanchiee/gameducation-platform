@@ -1,0 +1,405 @@
+import type { StrandhootPack } from "../engine/types"
+
+export const energyCritB: StrandhootPack = {
+  slug: "energy-crit-b",
+  title: "Investigating the Combustion of Alcohols",
+  subject: "MYP Chemistry",
+  criterion: "B",
+  topic: "Designing an energy density investigation",
+  accent: "#c0392b",
+  icon: "🧪",
+  statementOfInquiry:
+    "Scientific and technological advances can enable functional energy transformations within, and between, systems.",
+  estMinutes: 27,
+  intro:
+    "Design a rigorous investigation into how the length of the carbon chain in an alcohol affects its energy density. The chapter's summative assessment uses methanol, ethanol, propan-1-ol and butan-1-ol burned beneath an aluminium can. Work strand by strand — from a sharp research question to a safe, step-by-step method.",
+  badges: [
+    {
+      id: "questioner",
+      label: "Fuel Investigator",
+      icon: "❓",
+      description: "Reach Level 8 on Research question",
+      strandId: "rq",
+      atLevel: 8,
+    },
+    {
+      id: "predictor",
+      label: "Bold Predictor",
+      icon: "🔮",
+      description: "Reach Level 8 on Hypothesis",
+      strandId: "hypothesis",
+      atLevel: 8,
+    },
+    {
+      id: "controller",
+      label: "Variable Master",
+      icon: "🎛️",
+      description: "Reach Level 8 on Variables",
+      strandId: "variables",
+      atLevel: 8,
+    },
+    {
+      id: "safe",
+      label: "Safe Scientist",
+      icon: "🥼",
+      description: "Reach Level 6+ on all strands",
+      atLevel: 6,
+    },
+  ],
+  paths: [
+    {
+      id: "default",
+      label: "Alcohol combustion investigation",
+      blurb: "Design an investigation into energy density of alcohols",
+      icon: "🔬",
+    },
+  ],
+  strands: [
+    {
+      id: "rq",
+      name: "Research question",
+      descriptor: "Write a focused, testable research question for the alcohol combustion investigation.",
+      guided: [
+        {
+          level: 2,
+          body: "Level 1–2: A research question names what you are investigating. Vague example: 'Which alcohol is best?' — too broad, no measurable variable.",
+        },
+        {
+          level: 4,
+          body: "Level 3–4: A stronger question names the independent variable (IV) and dependent variable (DV): 'How does the type of alcohol affect the energy released when it burns?' IV = type of alcohol; DV = energy released.",
+        },
+        {
+          level: 6,
+          body: "Level 5–6: A specific, testable question includes range, DV with units, and a controlled variable: 'How does the number of carbon atoms in an alcohol (1–4: methanol, ethanol, propan-1-ol, butan-1-ol) affect the temperature change per gram of fuel burned (°C g⁻¹), when heating 100 cm³ of water in an aluminium can at constant starting temperature?'",
+        },
+        {
+          level: 8,
+          body: "Level 7–8: An operationalised question specifies measurement technique and precision: 'How does the number of carbon atoms in a straight-chain alcohol (C1–C4: methanol, ethanol, propan-1-ol, butan-1-ol) affect the heat released per gram of fuel consumed (J g⁻¹), measured by heating 100 cm³ of distilled water in an aluminium can using a spirit burner, with temperature measured to ±0.1°C using a calibrated digital thermometer, at a starting temperature of 20 ± 1°C?'",
+        },
+      ],
+      response: {
+        kind: "design",
+        prompt:
+          "Write a research question to investigate how the carbon chain length of an alcohol affects the energy it releases on combustion.",
+        scaffolds: [
+          "How does the number of carbon atoms in...",
+          "...affect the temperature change per gram of fuel burned...",
+          "...when heating 100 cm³ of water in an aluminium can...",
+          "...at constant starting temperature of...",
+        ],
+        rubric: [
+          {
+            level: 2,
+            descriptor: "Names the topic or one variable vaguely.",
+            keywords: ["alcohol", "burn", "energy", "combustion", "heat", "temperature"],
+            minKeywords: 1,
+          },
+          {
+            level: 4,
+            descriptor: "IV (type/chain length of alcohol) and DV (energy/temperature change) named.",
+            keywords: ["carbon", "alcohol", "temperature change", "energy", "chain", "methanol", "ethanol"],
+            minKeywords: 2,
+          },
+          {
+            level: 6,
+            descriptor: "Specific range stated (C1–C4 alcohols), DV with units, one CV identified.",
+            keywords: [
+              "methanol",
+              "ethanol",
+              "propan",
+              "butan",
+              "°c/g",
+              "100 cm³",
+              "water",
+              "constant",
+              "starting temperature",
+            ],
+            minKeywords: 3,
+          },
+          {
+            level: 8,
+            descriptor: "Operationalised: measurement technique, precision, and conditions specified.",
+            keywords: [
+              "±0.1",
+              "calibrated",
+              "digital thermometer",
+              "j g",
+              "distilled water",
+              "spirit burner",
+              "20°c",
+              "per gram",
+              "precision",
+            ],
+            minKeywords: 3,
+          },
+        ],
+      },
+    },
+    {
+      id: "hypothesis",
+      name: "Hypothesis",
+      descriptor: "Predict how carbon chain length affects energy density, with scientific reasoning.",
+      guided: [
+        {
+          level: 2,
+          body: "Level 1–2: A hypothesis makes a directional prediction: 'Longer chain alcohols will release more energy.' — a start, but no scientific reasoning.",
+        },
+        {
+          level: 4,
+          body: "Level 3–4: An if/then hypothesis: 'If the number of carbon atoms increases, then the energy released per gram will increase.' — names IV and DV with direction, but lacks chemical explanation.",
+        },
+        {
+          level: 6,
+          body: "Level 5–6: A justified hypothesis uses chemical reasoning: 'If the carbon chain length increases (methanol → butan-1-ol), then the temperature change per gram of fuel will increase, because longer chain alcohols have more C–H and C–C bonds. Combustion breaks these bonds and forms C=O and O–H bonds in CO₂ and H₂O. More bonds broken and formed means more energy released per molecule.'",
+        },
+        {
+          level: 8,
+          body: "Level 7–8: A quantitative hypothesis: 'As the carbon chain increases by one –CH₂– unit, the number of C–H bonds increases by two and one C–C bond is added, increasing energy released per mole. However, energy per gram may increase more slowly because molar mass also increases. Based on the pattern, I predict butan-1-ol will give approximately 50–60% more temperature change per gram than methanol. The relationship should be approximately linear when plotted as energy per gram vs carbon number.'",
+        },
+      ],
+      response: {
+        kind: "design",
+        prompt:
+          "Write a hypothesis predicting how the number of carbon atoms in an alcohol affects the energy it releases per gram when burned. Include scientific reasoning about bond energies.",
+        scaffolds: [
+          "If the number of carbon atoms increases, then...",
+          "because longer chain alcohols contain more...",
+          "Combustion of these bonds forms..., releasing...",
+          "Therefore, I predict that butan-1-ol will release ___% more energy per gram than methanol because...",
+        ],
+        rubric: [
+          {
+            level: 2,
+            descriptor: "States a prediction about carbon chain and energy.",
+            keywords: ["carbon", "alcohol", "energy", "more", "increase", "longer"],
+            minKeywords: 1,
+          },
+          {
+            level: 4,
+            descriptor: "If/then structure with IV and DV named and direction stated.",
+            keywords: [
+              "if",
+              "then",
+              "carbon",
+              "chain",
+              "energy",
+              "temperature",
+              "increases",
+              "per gram",
+            ],
+            minKeywords: 2,
+          },
+          {
+            level: 6,
+            descriptor: "Bond energy reasoning: more C–H/C–C bonds, combustion forms CO₂ and H₂O.",
+            keywords: [
+              "c-h",
+              "bond",
+              "combustion",
+              "co2",
+              "h2o",
+              "more bonds",
+              "energy released",
+              "per molecule",
+              "chain length",
+            ],
+            minKeywords: 3,
+          },
+          {
+            level: 8,
+            descriptor: "Quantitative prediction accounting for molar mass; trend described.",
+            keywords: [
+              "molar mass",
+              "per mole",
+              "ch2",
+              "approximately",
+              "linear",
+              "butan",
+              "50%",
+              "60%",
+              "pattern",
+              "quantitative",
+            ],
+            minKeywords: 2,
+          },
+        ],
+      },
+    },
+    {
+      id: "variables",
+      name: "Variables",
+      descriptor: "Classify all variables for the alcohol combustion investigation.",
+      guided: [
+        {
+          level: 2,
+          body: "Level 1–2: Three types of variable: independent (IV — what you change), dependent (DV — what you measure), controlled (CVs — what you keep constant to make it a fair test).",
+        },
+        {
+          level: 4,
+          body: "Level 3–4: For this investigation: IV = type of alcohol (methanol, ethanol, propan-1-ol, butan-1-ol). DV = temperature change per gram of fuel burned (°C g⁻¹). CVs include: volume of water, initial temperature of water, distance between spirit burner and can.",
+        },
+        {
+          level: 6,
+          body: "Level 5–6: IV: alcohol used (methanol CH₃OH, ethanol C₂H₅OH, propan-1-ol C₃H₇OH, butan-1-ol C₄H₉OH). DV: temperature change per gram of fuel consumed (°C g⁻¹), measured using a thermometer (±0.1°C) and electronic balance (±0.01 g). CVs: volume of water (100 cm³ ± 0.5 cm³, using a measuring cylinder), initial water temperature (record and allow to return to room temperature between trials), distance from wick to can base (constant using a clamp stand), duration of burning (until a set temperature rise, e.g. 20°C, is reached).",
+        },
+        {
+          level: 8,
+          body: "Level 7–8: As Level 5–6, plus: each CV stated with the control method and reason. E.g. distance to can: controlled by clamping the can at a fixed height — if distance varies, heat transfer efficiency changes and DV is affected. Type of can: same aluminium can reused — different materials have different heat capacities. Heat loss: a draught shield (cardboard surround) controls air currents. A potential systematic error: evaporation of alcohol from the open spirit burner cap before lighting — always re-weigh immediately before and after burning. Repeat each alcohol 3× for reliability.",
+        },
+      ],
+      response: {
+        kind: "design",
+        prompt:
+          "Identify and classify all variables for the alcohol combustion investigation. For your controlled variables, state how each is controlled and why.",
+        scaffolds: [
+          "Independent variable (IV): the type of alcohol used —",
+          "Dependent variable (DV): temperature change per gram of fuel burned, measured using...",
+          "Controlled variables (CVs):",
+          "  - Volume of water: controlled by... because...",
+          "  - Distance from burner to can: controlled by... because...",
+          "  - Starting temperature: controlled by... because...",
+        ],
+        rubric: [
+          {
+            level: 2,
+            descriptor: "Names one type of variable.",
+            keywords: ["independent", "dependent", "controlled", "variable", "alcohol", "temperature"],
+            minKeywords: 1,
+          },
+          {
+            level: 4,
+            descriptor: "IV, DV named with units; 2+ CVs listed.",
+            keywords: [
+              "independent variable",
+              "dependent variable",
+              "°c/g",
+              "volume",
+              "water",
+              "100 cm³",
+              "distance",
+            ],
+            minKeywords: 2,
+          },
+          {
+            level: 6,
+            descriptor: "IV, DV with measurement method; 4+ CVs with values/units.",
+            keywords: [
+              "balance",
+              "thermometer",
+              "±0.1",
+              "100 cm³",
+              "measuring cylinder",
+              "clamp",
+              "height",
+              "initial temperature",
+              "repeat",
+            ],
+            minKeywords: 3,
+          },
+          {
+            level: 8,
+            descriptor: "Each CV with control method, reason, and systematic error identified.",
+            keywords: [
+              "clamp stand",
+              "heat transfer",
+              "draught shield",
+              "evaporation",
+              "re-weigh",
+              "systematic error",
+              "reliability",
+              "3 times",
+              "aluminium",
+              "heat capacity",
+            ],
+            minKeywords: 3,
+          },
+        ],
+      },
+    },
+    {
+      id: "method",
+      name: "Method",
+      descriptor: "Write a safe, step-by-step method to compare the energy density of four alcohols.",
+      guided: [
+        {
+          level: 2,
+          body: "Level 1–2: Lists equipment or gives 1–2 vague steps: 'Light the alcohol and measure temperature change.' — no volumes, no safety, no detail about how to measure mass.",
+        },
+        {
+          level: 4,
+          body: "Level 3–4: Logical steps: (1) Measure 100 cm³ of water into an aluminium can. (2) Weigh the spirit burner before lighting. (3) Light the burner under the can. (4) When ΔT reaches 20°C, blow out the flame. (5) Re-weigh the spirit burner. (6) Calculate temperature change per gram burned.",
+        },
+        {
+          level: 6,
+          body: "Level 5–6: Numbered steps with volumes and masses, safety precautions, and measurement detail. Safety: flammable alcohols — keep away from other spirit burners; use heat-proof mat; do not lean over burning flame. Steps specify: 100 cm³ water (measuring cylinder), initial temperature recorded with thermometer, spirit burner weighed before and after (to ±0.01 g), aluminium can clamped at fixed height above burner, stir water gently, record maximum temperature, repeat 3 times for each alcohol.",
+        },
+        {
+          level: 8,
+          body: "Level 7–8: Adds a draught shield (cardboard box) to reduce heat loss to air currents; specifies replacing water with fresh room-temperature water between trials; records the mass of the spirit burner cap to account for vapour loss; includes a results table with columns for initial T, final T, ΔT, initial mass of burner+fuel, final mass, mass of fuel burned, and ΔT per gram; states the balanced equation for the combustion of each alcohol, e.g. for ethanol: C₂H₅OH(l) + 3O₂(g) → 2CO₂(g) + 3H₂O(l).",
+        },
+      ],
+      response: {
+        kind: "design",
+        prompt:
+          "Write a numbered, step-by-step method to compare the energy released per gram when four alcohols (methanol, ethanol, propan-1-ol, butan-1-ol) are burned in a spirit burner beneath an aluminium can of water.",
+        scaffolds: [
+          "1. Using a measuring cylinder, measure 100 cm³ of distilled water into an aluminium drinks can...",
+          "2. Clamp the aluminium can at a fixed height of ___ cm above the spirit burner...",
+          "3. Record the initial temperature of the water using a thermometer to ±0.1°C...",
+          "4. Weigh the spirit burner + fuel using an electronic balance...",
+          "5. Light the wick and allow the water to heat until ΔT = 20°C, then extinguish the flame...",
+          "6. Immediately re-weigh the spirit burner + remaining fuel...",
+          "Safety: alcohols are flammable — keep spirit burners capped when not in use...",
+        ],
+        rubric: [
+          {
+            level: 2,
+            descriptor: "Lists equipment or 1–2 vague steps.",
+            keywords: ["alcohol", "water", "heat", "temperature", "spirit burner", "can"],
+            minKeywords: 1,
+          },
+          {
+            level: 4,
+            descriptor: "Logical sequence with 5+ steps; mass and temperature measured.",
+            keywords: ["measure", "weigh", "light", "extinguish", "re-weigh", "temperature", "change"],
+            minKeywords: 3,
+          },
+          {
+            level: 6,
+            descriptor: "Numbered steps with volumes, safety, repetition, and fixed height.",
+            keywords: [
+              "100 cm³",
+              "clamp",
+              "fixed height",
+              "±0.01 g",
+              "flammable",
+              "safety",
+              "repeat",
+              "3 times",
+              "initial temperature",
+              "maximum temperature",
+            ],
+            minKeywords: 4,
+          },
+          {
+            level: 8,
+            descriptor: "Draught shield; fresh water; results table; balanced equation included.",
+            keywords: [
+              "draught shield",
+              "cardboard",
+              "fresh water",
+              "vapour loss",
+              "results table",
+              "balanced equation",
+              "c2h5oh",
+              "co2",
+              "h2o",
+              "combustion",
+            ],
+            minKeywords: 3,
+          },
+        ],
+      },
+    },
+  ],
+}

@@ -49,7 +49,7 @@ function normCode(code: string) {
 async function fetchSession(code: string): Promise<{ session: Session; activity: Activity } | null> {
   // 1. API
   try {
-    const res = await fetch(`/api/live/${normCode(code)}`);
+    const res = await fetch(`/desmos/api/live/${normCode(code)}`);
     if (res.ok) {
       const data = await res.json() as { session?: Session; activity?: Activity };
       if (data.session && data.activity) return { session: data.session, activity: data.activity };
@@ -100,7 +100,7 @@ export default function StudentJoinPage() {
       );
     } catch { /* quota */ }
     // API relay (cross-device)
-    fetch(`/api/live/${normCode(code)}`, {
+    fetch(`/desmos/api/live/${normCode(code)}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ student: data }),

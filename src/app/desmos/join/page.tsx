@@ -23,7 +23,7 @@ export default function JoinPage() {
     setLoading(true);
     setError("");
     // Navigate to the session join page
-    router.push(`/join/${parsed}`);
+    router.push(`/desmos/join/${parsed}`);
   };
 
   return (
@@ -33,7 +33,7 @@ export default function JoinPage() {
     >
       <div className="w-full max-w-sm">
         <Link
-          href="/"
+          href="/desmos"
           className="inline-flex items-center gap-1.5 text-sm mb-8 hover:opacity-70 transition-opacity"
           style={{ color: "var(--color-muted)" }}
         >
@@ -99,7 +99,7 @@ export default function JoinPage() {
           <p className="text-xs mt-6" style={{ color: "var(--color-subtle)" }}>
             Are you a teacher?{" "}
             <Link
-              href="/auth/login"
+              href="/desmos/auth/login"
               className="font-medium hover:underline"
               style={{ color: "var(--color-brand-teal)" }}
             >

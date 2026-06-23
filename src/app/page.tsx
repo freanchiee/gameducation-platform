@@ -74,7 +74,7 @@ const PRODUCTS: Product[] = [
       "Track strands & levels per student",
     ],
     cta: "Create a Strandhoot",
-    href: "/strandhoot-builder",
+    href: "/strandhoots",
   },
 ]
 

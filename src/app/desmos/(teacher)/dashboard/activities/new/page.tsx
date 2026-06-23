@@ -244,7 +244,7 @@ function NewActivityPage() {
         style={{ backgroundColor: "var(--color-white)", borderColor: "var(--color-border)" }}
       >
         <Link
-          href="/dashboard/activities"
+          href="/desmos/dashboard/activities"
           className="p-1.5 rounded-lg transition-colors"
           style={{ color: "var(--color-muted)" }}
         >
@@ -288,7 +288,7 @@ function NewActivityPage() {
         </button>
 
         <Link
-          href={`/dashboard/sessions?activity=${activity.id}`}
+          href={`/desmos/dashboard/sessions?activity=${activity.id}`}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold text-white transition-colors"
           style={{ backgroundColor: "var(--color-brand-teal)", fontFamily: "var(--font-body)" }}
         >
